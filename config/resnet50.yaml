@@ -1,0 +1,10 @@
+DATA:
+  IMG_SIZE: 256
+MODEL:
+  TYPE: resnet
+  NAME: resnet50
+  DROP_PATH_RATE: 0.2
+  RESNET:
+    EMBED_DIM: 128
+    DEPTHS: [ 2, 2, 6, 2 ]
+    NUM_HEADS: [ 3, 6, 12, 24 ]

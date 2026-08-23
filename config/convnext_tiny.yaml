@@ -1,0 +1,8 @@
+DATA:
+  IMG_SIZE: 256
+MODEL:
+  TYPE: convnext
+  NAME: convnext
+  DROP_PATH_RATE: 0.2
+  CONVNEXT:
+    EMBED_DIM: 48
