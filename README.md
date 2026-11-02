@@ -1,5 +1,4 @@
 
-
 # AM-OIQA
 
 # The source code of AM-OIQA.
@@ -45,4 +44,4 @@ We support the following databases: CVIQ, OIQA, and OIQ10K databases for cross-d
 
 lxliu@bit.edu.cn  
 yqliu@bit.edu.cn
-zyhu@bit.edu.cn
+zyhu@ncut.edu.cn
