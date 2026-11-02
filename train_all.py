@@ -14,16 +14,14 @@ from torch.utils.data import DataLoader
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="360 Image Quality Assessment")
+    parser = argparse.ArgumentParser(description="Autoregressive Molding Omnidirectional Image Quality Assessment")
     parser.add_argument('--num_epochs', help='Maximum number of training epochs.', default=200, type=int)
     parser.add_argument('--batch_size', help='Batch size.', default=8, type=int)
-    parser.add_argument('--lr', help='Learning rate.',type=float, default=1e-5)#1e-4
+    parser.add_argument('--lr', help='Learning rate,  defaul is 1e-4.',type=float, default=1e-4)
     parser.add_argument('--snapshot',   help='Path of model snapshot.', default='checkpoint', type=str)
-    parser.add_argument('--cross_validation_index', dest='cross_validation_index',
-                        help='The index of cross validation.', default=1, type=int)
-    parser.add_argument('--model', default='TAGIQA', type=str,
-                        help='Model name for experiment, default is TAGIQA')
-    parser.add_argument('--database', default='CVIQ', help = 'The training database of the model:CVIQ|OIQA|IQA-ODI|MVAQD|OIQ10K' ,type=str)  
+    parser.add_argument('--cross_validation_index', dest='cross_validation_index', help='The index of cross validation.', default=1, type=int)
+    parser.add_argument('--model', default='AMOIQA', type=str, help='Model name for experiment, default is AMIQA.')
+    parser.add_argument('--database', default='CVIQ', help = 'The training database of the model:CVIQ|OIQA|IQA-ODI|MVAQD|OIQ10K.' ,type=str)  
     args = parser.parse_args()
     return args
 def trainer(num_epochs:int, train_loader:DataLoader, test_loader:DataLoader, model, criterion, optimizer, logger, model_save_path:str, cross, best:np.ndarray) -> np.ndarray:
@@ -81,18 +79,17 @@ def trainer(num_epochs:int, train_loader:DataLoader, test_loader:DataLoader, mod
             y_test = np.concatenate(y_test)
             y_output = np.concatenate(y_output)
             test_PLCC, test_SRCC, test_KRCC, test_RMSE = performance_fit(y_test, y_output)
-            print("Test results: SROCC={:.4f}, PLCC={:.4f}, RMSE={:.4f}".format(test_SRCC, test_PLCC, test_RMSE, test_PLCC, test_RMSE))
+            print("Test results: SROCC={:.4f}, PLCC={:.4f}, RMSE={:.4f}\n".format(test_SRCC, test_PLCC, test_RMSE, test_PLCC, test_RMSE))
 
             # check if the current model is the best model
-            if test_SRCC+test_PLCC > best[0]+best[2]:
+            if abs(test_SRCC)+abs(test_PLCC) > best[0]+best[2]:
                 print("Update best model using best_val_criterion in epoch {}".format(epoch + 1))
                 torch.save(model.state_dict(), os.path.join(model_save_path, str(cross), 'best_model.pth'))
                 
                 # update the best results
-                best[0:4] = [test_SRCC, test_KRCC, test_PLCC, test_RMSE]
+                best[0:4] = [abs(test_SRCC), abs(test_KRCC), abs(test_PLCC), test_RMSE]
 
-            print("Best results: SROCC={:.4f}, KROCC={:.4f}, PLCC={:.4f}, RMSE={:.4f}".format(best[0], best[1],
-                                                                                                best[2], best[3]))
+            print("Best results: SROCC={:.4f}, KROCC={:.4f}, PLCC={:.4f}, RMSE={:.4f}".format(best[0], best[1], best[2], best[3]))
             logger.info(
                 f"\nepoch: {epoch + 1}\t Best SROCC :{best[0]:.4f} \tBest PLCC :{best[2]:.4f}\tBest KROCC :{best[1]:.4f}\tBest RMSE :{best[3]:.4f}\n "
                 f"\t\ttest : SROCC: {test_SRCC:.4f} \t\tPLCC: {test_PLCC:.4f} \t\tKROCC: {test_KRCC:.4f} \t\tRMSE: {test_RMSE:.4f}\n")
@@ -144,7 +141,9 @@ if __name__ == '__main__':
     best_all = np.zeros([5, 4])
     csv_path = './data/' + database + '/'
     model_save_path = os.path.join(snapshot, args.model, database, 'batch=' + str(batch_size))  
-    #wait_for_gpu_memory()
+
+    # Waiting for the free of GPU
+    # wait_for_gpu_memory()
 
 
     if not os.path.exists(os.path.join(model_save_path, str(cross))):
@@ -158,7 +157,7 @@ if __name__ == '__main__':
         if not os.path.exists(os.path.join(model_save_path, str(cross))):
             os.makedirs(os.path.join(model_save_path, str(cross)))
        
-        # create model
+        # create model, default with swinv2_tiny_patch4_window8_256 
         model = AMOIQA(backbone="swinv2_tiny_patch4_window8_256",pretrained=True).to("cuda")
         filename_train = csv_path + database + '_trainc_' + str(i + 1) + '.csv'
         filename_test = csv_path + database + '_testc_' + str(i + 1) + '.csv'
@@ -181,16 +180,12 @@ if __name__ == '__main__':
         best = np.zeros(4)
         best = trainer(num_epochs,train_loader,test_loader,model,criterion, optimizer,logger,model_save_path,cross,best)
         best_all[i, :] = best
-        print("The best Val results: SROCC={:.4f}, KROCC={:.4f}, PLCC={:.4f}, RMSE={:.4f}".format(best[0], best[1], 
-                                                                                                  best[2], best[3]))
+        print("The best Val results: SROCC={:.4f}, KROCC={:.4f}, PLCC={:.4f}, RMSE={:.4f}".format(best[0], best[1], best[2], best[3]))
     best_mean = np.mean(best_all, 0)
-    print("The mean val results: {:.4f}, {:.4f}, {:.4f}, {:.4f}".format(best_mean[0], best_mean[1],
-                                                                        best_mean[2], best_mean[3]))
+    print("The mean val results: {:.4f}, {:.4f}, {:.4f}, {:.4f}".format(best_mean[0], best_mean[1], best_mean[2], best_mean[3]))
                                                                                               
     logger.info("Best output: SROCC \tPLCC \tKROCC \tRMSE \n")
     for i in range(0,5):
-        logger.info("Fold {:d}:{:.4f}\t {:.4f}\t {:.4f}\t {:.4f}\t".format(i,
-                                                                best_all[i][0], best_all[i][1], 
-                                                                best_all[i][2], best_all[i][3]))
+        logger.info("Fold {:d}:{:.4f}\t {:.4f}\t {:.4f}\t {:.4f}\t".format(i, best_all[i][0], best_all[i][1], best_all[i][2], best_all[i][3]))
 
      

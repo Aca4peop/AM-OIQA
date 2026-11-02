@@ -13,10 +13,10 @@ OPENAI_CLIP_MEAN = (0.48145466, 0.4578275, 0.40821073)
 OPENAI_CLIP_STD = (0.26862954, 0.26130258, 0.27577711)
 
 class Dataset_Enhanced(Dataset):
-   
     def __init__(self, csv_path, database, train):
         """
-        Dataset class for loading and processing the data with data argument.
+        Dataset class for loading and processing the data with data argument (Crop). 
+        You need extract the viewports with size of 512 \times 512. 
         Args:
             csv_path: path to the csv file containing the index of images.
             database: name of the database.
