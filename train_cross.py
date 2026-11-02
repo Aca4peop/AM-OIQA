@@ -11,7 +11,7 @@ from tqdm import tqdm
 
 import dataset_vp
 import subprocess
-from AMOIQA import AMIQA,VASIQA_without_VAR
+from AMOIQA import AMOIQA,VASIQA_without_VAR
 from utils import performance_fit, seed_torch, getlogger,PLCCLoss
 import torch.multiprocessing
 torch.multiprocessing.set_sharing_strategy('file_system')
@@ -25,7 +25,7 @@ def parse_args():
     parser.add_argument('--lr', type=float, default=1e-4)#1e-4
     parser.add_argument('--snapshot', help='Path of model snapshot.', default='checkpoint', type=str)
     parser.add_argument('--train_database', default='CVIQ', type=str, help='CVIQ|OIQA|IQA-ODI|MVAQD|OIQ10K')  
-    parser.add_argument('--model', default='AMIQA', type=str, help='Model name for experiment, default is AMIQA.')
+    parser.add_argument('--model', default='AMOIQA', type=str, help='Model name for experiment, default is AMIQA.')
     args = parser.parse_args()
 
     return args
@@ -87,7 +87,7 @@ if __name__ == '__main__':
 
     seed_torch(2024)
     
-    model = AMIQA(pretrained=True).to("cuda")
+    model = AMOIQA(pretrained=True).to("cuda")
     filename_train = csv_train + train_database + '.csv'
     #cmp dataset
     train_dataset = dataset_vp.Dataset(csv_path=filename_train, database=train_database, train=True)

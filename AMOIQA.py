@@ -189,12 +189,12 @@ class SpaceAttn(nn.Module):
         attn = self.sigmoid(self.conv(x_cat))
         return attn
 
-class AMIQA(nn.Module):
+class AMOIQA(nn.Module):
     def __init__(self, backbone="swinv2_tiny_patch4_window8_256",pretrained=False,
                  drop_rate = 0.0, attn_drop_rate=0.0,drop_path_rate=0.0,#CVIQ0.2, 待验证OIQA0.2 IQA-ODI0.0 OIQ 0.0
                  attn_l2_norm=True, flash_if_available=True, fused_if_available=True
                  ):
-        super(AMIQA, self).__init__()
+        super(AMOIQA, self).__init__()
 
         self.config = yaml.safe_load(open(f'config/{backbone}.yaml','r'))
         self.embed_dim = self.config['MODEL']['SWINV2']['EMBED_DIM']

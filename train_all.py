@@ -8,7 +8,7 @@ import torch.backends.cudnn as cudnn
 from tqdm import tqdm
 from dataset_vp import get_dataset
 import subprocess
-from AMOIQA import AMIQA
+from AMOIQA import AMOIQA
 from utils import performance_fit, seed_torch, getlogger,PLCCLoss
 from torch.utils.data import DataLoader
 
@@ -20,7 +20,7 @@ def parse_args():
     parser.add_argument('--lr', help='Learning rate,  defaul is 1e-4.',type=float, default=1e-4)
     parser.add_argument('--snapshot',   help='Path of model snapshot.', default='checkpoint', type=str)
     parser.add_argument('--cross_validation_index', dest='cross_validation_index', help='The index of cross validation.', default=1, type=int)
-    parser.add_argument('--model', default='AMIQA', type=str, help='Model name for experiment, default is AMIQA.')
+    parser.add_argument('--model', default='AMOIQA', type=str, help='Model name for experiment, default is AMIQA.')
     parser.add_argument('--database', default='CVIQ', help = 'The training database of the model:CVIQ|OIQA|IQA-ODI|MVAQD|OIQ10K.' ,type=str)  
     args = parser.parse_args()
     return args
@@ -158,7 +158,7 @@ if __name__ == '__main__':
             os.makedirs(os.path.join(model_save_path, str(cross)))
        
         # create model, default with swinv2_tiny_patch4_window8_256 
-        model = AMIQA(backbone="swinv2_tiny_patch4_window8_256",pretrained=True).to("cuda")
+        model = AMOIQA(backbone="swinv2_tiny_patch4_window8_256",pretrained=True).to("cuda")
         filename_train = csv_path + database + '_trainc_' + str(i + 1) + '.csv'
         filename_test = csv_path + database + '_testc_' + str(i + 1) + '.csv'
 
