@@ -11,7 +11,7 @@ from tqdm import tqdm
 
 import dataset_vp
 import subprocess
-from AMIQA import AMIQA,VASIQA_without_VAR
+from AMOIQA import AMIQA,VASIQA_without_VAR
 from utils import performance_fit, seed_torch, getlogger,PLCCLoss
 import torch.multiprocessing
 torch.multiprocessing.set_sharing_strategy('file_system')

@@ -8,7 +8,7 @@ import torch.backends.cudnn as cudnn
 from tqdm import tqdm
 from dataset_vp import get_dataset
 import subprocess
-from AMIQA import AMIQA
+from AMOIQA import AMIQA
 from utils import performance_fit, seed_torch, getlogger,PLCCLoss
 from torch.utils.data import DataLoader
 
